@@ -1,6 +1,7 @@
 from fastapi import (
     APIRouter,
-    status
+    status,
+    HTTPException,
 )
 from app.schemas.book import (
     BookDetails,
@@ -50,8 +51,11 @@ def create_book_routes():
 
     @book_router.delete("/{book_id}", response_model=BookDeletionResponse)
     async def remove_book_by_id(book_id: int) -> BookDeletionResponse:
-        await book_service.delete_book(book_id)
-        msg = BookDeletionResponse(message="Book Deleted Successfully!")
+        try:
+            await book_service.delete_book(book_id)
+            msg = BookDeletionResponse(message="Book Deleted Successfully!")
+        except:
+            raise HTTPException(status_code=404, detail="User does not exist!")
         return msg
 
     return book_router
